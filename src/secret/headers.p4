@@ -35,11 +35,4 @@ struct metadata_t {
     bit<128> aux5;
 }
 
-// op: 1 = grava token
-// op: 2 = envia mensagem
-header secret_h {
-    bit<8> op;
-    bit<128> token;
-}
-
 #endif /* _HEADERS_ */
