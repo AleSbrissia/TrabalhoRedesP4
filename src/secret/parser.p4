@@ -60,6 +60,14 @@ parser SwitchIngressParser(packet_in pkt,
         meta = {0, 0, 0, 0, 0};
         pkt.extract(hdr.ethernet);
         /* DICA: utilizar transition select */
+        transition select(hdr.ethernet.ether_type) {
+            0x1234 : parse_secret_msg;
+            default : reject;
+        }
+    }
+
+    state parse_secret_msg {
+        pkt.extract(hdr.secret);
         transition accept;
     }
 }
