@@ -62,7 +62,7 @@ parser SwitchIngressParser(packet_in pkt,
         /* DICA: utilizar transition select */
         transition select(hdr.ethernet.ether_type) {
             0x1234 : parse_secret_msg;
-            default : reject;
+            default : accept;
         }
     }
 

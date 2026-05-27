@@ -90,13 +90,23 @@ control SwitchIngress(
                     //hdr.secret.token[63:32]  == saved_p1 &&
                     //hdr.secret.token[95:64]  == saved_p2 &&
                     //hdr.secret.token[127:96] == saved_p3
-
-                    if (hdr.secret.token[31:0]  == saved_p0) 
-                    {
-                        // Sucesso
-                    } else {
+                    
+                    if (hdr.secret.token[31:0] != saved_p0) {
                         ig_dprsr_md.drop_ctl = 1;
                     }
+
+                    if (hdr.secret.token[63:32] != saved_p1) {
+                        ig_dprsr_md.drop_ctl = 1;
+                    }
+
+                    if (hdr.secret.token[95:64] != saved_p2) {
+                        ig_dprsr_md.drop_ctl = 1;
+                    }
+
+                    if (hdr.secret.token[127:96] != saved_p3) {
+                        ig_dprsr_md.drop_ctl = 1;
+                    }
+
                 }
 
             }
