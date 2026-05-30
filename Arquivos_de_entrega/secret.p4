@@ -62,26 +62,31 @@ control SwitchIngress(
 
     apply {
 
-        // Se o pacote não for do tipo tunel ele é dropado
-        if (hdr.ethernet.ether_type != ETHERTYPE_TUNEL_SECRETO){
-            ig_dprsr_md.drop_ctl = 1;
-        } else if (hdr.type.msg_type == 0x00) { // SET_TOKEN = 0
+        // Escreve o novo token nos registradores
+        if (hdr.ethernet.ether_type == MSG_SET_TOKEN) {
             token0.write(0, hdr.token.part0);
             token1.write(0, hdr.token.part1);
             token2.write(0, hdr.token.part2);
             token3.write(0, hdr.token.part3);
 
-            forward.apply();
+            ig_dprsr_md.drop_ctl = 1;
 
-        } else if (hdr.type.msg_type == 0x01) { // MSG_TOKEN =1
+        // Se a mensagem contem o token certo ela atravessa o switch
+        } else if (hdr.ethernet.ether_type == MSG_TOKEN) {
 
-            // !!!! FALTA CRIAR UMA LÓGICA MENOS COMPLEXA !!!!
-            if (hdr.token.part0 == token0.read(0)) {
-                // if ( hdr.token.part1 == token1.read(0))
-                //     if (hdr.token.part2 == token2.read(0))
-                //         if (hdr.token.part3 == token3.read(0))
-                forward.apply();
+            if (hdr.token.part0 != token0.read(0)) {
+                ig_dprsr_md.drop_ctl = 1;
             }
+            if ( hdr.token.part1 != token1.read(0)){
+                ig_dprsr_md.drop_ctl = 1;
+            }
+            if (hdr.token.part2 != token2.read(0)) {
+                ig_dprsr_md.drop_ctl = 1;
+            }
+            if (hdr.token.part3 != token3.read(0)) {
+                ig_dprsr_md.drop_ctl = 1;
+            }
+            forward.apply();
         } else {
             ig_dprsr_md.drop_ctl = 1;
         }

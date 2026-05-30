@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 import sys
-from scapy.all import Ether, Packet, ByteField, BitField, bind_layers, sendp
-
-SET_TOKEN_TYPE = 0
-MSG_TOKEN_TYPE = 1
+from scapy.all import Ether, Packet, ByteField, BitField, bind_layers, sendp, time
 
 class SecretHeader(Packet):
     name = "SecretHeader"
     fields_desc = [
-        ByteField("msg_type", 1),       # 1 byte para o tipo da mensagem (Ex:0=Gravar Token, 1=Msg normal)
         BitField("token", 0, 128)       # 16 bytes (128 bits) para o Token Secreto
     ]
 
-ETHERTYPE_SECRET = 0x1234
-bind_layers(Ether, SecretHeader, type=ETHERTYPE_SECRET)
-
+MSG_SET_TOKEN = 0x1234
+MSG_TOKEN = 0x4321
+bind_layers(Ether, SecretHeader, type=MSG_SET_TOKEN)
+bind_layers(Ether, SecretHeader, type=MSG_TOKEN)
 
 def enviar():
 
@@ -31,8 +28,8 @@ def enviar():
 
     token_16bytes = 0x11223344556677889900AABBCCDDEEFF 
     pkt = (
-        Ether(src=mac_origem, dst=mac_destino, type=ETHERTYPE_SECRET) /
-        SecretHeader(msg_type=SET_TOKEN_TYPE, token=token_16bytes) /
+        Ether(src=mac_origem, dst=mac_destino, type=MSG_SET_TOKEN) /
+        SecretHeader(token=token_16bytes) /
         "Escrevendo TOKEN no switch"
     )
 
@@ -44,6 +41,8 @@ def enviar():
     sendp(pkt, iface=interface_origem, verbose=False)
     print(f"\nPacote enviado com sucesso!")
 
+    time.sleep(0.5)
+
     ##############################################################################
     #### MSG WITH WRONG TOKEN ####################################################
     # Esta mensagem deve ser dropada pelo switch
@@ -53,9 +52,9 @@ def enviar():
 
     token_16bytes = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     pkt = (
-        Ether(src=mac_origem, dst=mac_destino, type=ETHERTYPE_SECRET) /
-        SecretHeader(msg_type=MSG_TOKEN_TYPE, token=token_16bytes) /
-        "Esta mensagem contém o TOKEN errado"
+        Ether(src=mac_origem, dst=mac_destino, type=MSG_TOKEN) /
+        SecretHeader(token=token_16bytes) /
+        "Esta mensagem contem o TOKEN errado"
     )
 
     print("Estrutura do pacote a ser enviado:")
@@ -63,6 +62,8 @@ def enviar():
 
     sendp(pkt, iface=interface_origem, verbose=False)
     print(f"\nPacote enviado com sucesso!")
+
+    time.sleep(0.5)
 
     ##############################################################################
     #### MSG WITH RIGHT TOKEN ####################################################
@@ -73,9 +74,9 @@ def enviar():
 
     token_16bytes = 0x11223344556677889900AABBCCDDEEFF
     pkt = (
-        Ether(src=mac_origem, dst=mac_destino, type=ETHERTYPE_SECRET) /
-        SecretHeader(msg_type=MSG_TOKEN_TYPE, token=token_16bytes) /
-        "Esta mensagem contém o TOKEN certo"
+        Ether(src=mac_origem, dst=mac_destino, type=MSG_TOKEN) /
+        SecretHeader(token=token_16bytes) /
+        "Esta mensagem contem o TOKEN certo"
     )
 
     print("Estrutura do pacote a ser enviado:")

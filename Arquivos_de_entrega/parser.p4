@@ -62,13 +62,13 @@ parser SwitchIngressParser(packet_in pkt,
 
         // Rejeita todos os pacotes que não são do tipo TUNEL_SECRETO
         transition select(hdr.ethernet.ether_type) {
-            ETHERTYPE_TUNEL_SECRETO : parse_token;
+            MSG_SET_TOKEN : parse_token;
+            MSG_TOKEN : parse_token;
             default : reject;
         }
     }
 
     state parse_token {
-        pkt.extract(hdr.type);
         pkt.extract(hdr.token);
         transition accept;
     }

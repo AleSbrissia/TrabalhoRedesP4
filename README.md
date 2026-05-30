@@ -5,11 +5,10 @@ do voodala e usar o arquivo python para testar o envio de pacotes.
 
 ## TO DO LIST
 
-- Falta melhorar a lógica da verificação do token. Nesta versão estamos comparando somente
-o primeiro byte do token
-
 - Criar um relatório
 
-- Aumentar o script de testes
+- Aumentar o script de testes. Modularizar o código em python
 
-- Mostrar versão atual para o professor
+- Mostrar versão atual para o professor. Perguntar se a lógica é essa mesmo e se o formato 
+do frame faz sentido.
+

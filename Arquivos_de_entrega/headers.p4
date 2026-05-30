@@ -12,9 +12,8 @@
 #include <tna.p4>
 #endif
 
-const bit<16> ETHERTYPE_TUNEL_SECRETO = 0x1234;
-const bit<8> MSG_TYPE_SET_TOKEN = 0x00;
-const bit<8> MSG_TOKEN = 0x01;
+const bit<16> MSG_SET_TOKEN = 0x1234;
+const bit<16> MSG_TOKEN = 0x4321;
 
 typedef bit<48> mac_addr_t;
 typedef bit<16> ether_type_t;
@@ -23,11 +22,6 @@ header ethernet_h {
     mac_addr_t dst_addr;
     mac_addr_t src_addr;
     bit<16> ether_type;
-}
-
-header msg_type_t {
-    // SET_TOKEN = 0 ou MSG_TOKEN = 1
-    bit<8> msg_type;
 }
 
 header token_t {
@@ -39,7 +33,6 @@ header token_t {
 
 struct header_t {
     ethernet_h ethernet;
-    msg_type_t type;
     token_t token;
 }
 
